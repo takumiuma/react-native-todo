@@ -6,6 +6,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedInputText } from "@/components/ThemedInputText";
 import { ThemedView } from "@/components/ThemedView";
+import { ThemedFlatList } from "@/components/ThemedFlatList";
 
 export default function HomeScreen() {
   const [text, setText] = React.useState("");
@@ -24,6 +25,8 @@ export default function HomeScreen() {
         <ThemedText type="title">よろ!</ThemedText>
         <HelloWave />
       </ThemedView>
+      {/* ParallaxScrollViewのスクロールと衝突するので、後でThemedFlatListを代わりに親タグとして使用する */}
+      <ThemedFlatList data={undefined} renderItem={undefined} />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>{text}</ThemedText>
