@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Platform } from "react-native";
+import { ListRenderItem, Image, StyleSheet, Platform } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -8,8 +8,35 @@ import { ThemedInputText } from "@/components/ThemedInputText";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedFlatList } from "@/components/ThemedFlatList";
 
+import { Todo, useTodoService } from "@/store/todoService";
+
 export default function HomeScreen() {
+  const { fetchTodos, createTodo, updateTodo, deleteTodo } = useTodoService();
   const [text, setText] = React.useState("");
+  const [todos, setTodos] = React.useState<Todo[]>([]);
+
+  const getTodos = async () => {
+    setTodos(await fetchTodos());
+  };
+
+  // 初期描画時にTodoリストを取得
+  React.useEffect(() => {
+    getTodos();
+  }, []); //　空の配列を第2引数に渡すことで初回のみ実行される
+
+  const renderTodos: ListRenderItem<Todo> = ({ item }) => (
+    <ThemedView key={item.id} style={styles.row}>
+      <ThemedText style={styles.cell}>{item.title}</ThemedText>
+      <ThemedText style={styles.cell}>{item.done ? "Done" : "In progress"}</ThemedText>
+    </ThemedView>
+  );
+
+  const headerComponent = (
+    <ThemedView style={styles.header}>
+      <ThemedText style={styles.cell}>タイトル</ThemedText>
+      <ThemedText style={styles.cell}>ステータス</ThemedText>
+    </ThemedView>
+  );
 
   return (
     <ParallaxScrollView
@@ -26,7 +53,7 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       {/* ParallaxScrollViewのスクロールと衝突するので、後でThemedFlatListを代わりに親タグとして使用する */}
-      <ThemedFlatList data={undefined} renderItem={undefined} />
+      <ThemedFlatList data={todos} renderItem={renderTodos} ListHeaderComponent={headerComponent} />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>{text}</ThemedText>
@@ -81,4 +108,7 @@ const styles = StyleSheet.create({
     left: 0,
     position: "absolute",
   },
+  header: { flexDirection: "row", borderBottomWidth: 1, borderColor: "#ccc" },
+  row: { flexDirection: "row", paddingVertical: 8 },
+  cell: { flex: 1, textAlign: "center" },
 });
